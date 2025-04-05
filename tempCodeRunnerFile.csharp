@@ -1,0 +1,122 @@
+#pragma GCC optimize("O3,unroll-loops")
+#include <bits/stdc++.h>
+#define ll long long
+#define modulo 10000007
+#define vecCreate long long int n ,x; cin>>n>>x; vector<long long int> a(n); for(long long int i=0;i<n;i++) cin >> a[i];
+#define vecCreate2 long long int n,x; cin>>n>>x; vector<long long int> a(n); for(long long int i=0;i<n;i++) cin >> a[i];
+#define vstring long long int n,q; cin>>n>>q; vector<string> a(n); for(long long int i=0;i<n;i++) cin>>a[i];
+#define nl endl
+using namespace std;
+void solve();
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int t; cin >> t;
+    while (t--)
+    solve();
+    return 0;
+}
+
+
+void solve(){
+        int n;
+        cin >> n;
+    
+        vector<int> a(n+1);
+        for (int i = 1; i <= n; i++){
+            cin >> a[i];
+        }
+       
+        vector<int> d(n+1);
+        for (int i = 1; i <= n; i++){
+            cin >> d[i];
+        }
+ 
+       
+        vector<bool> forced(n+1, false);
+      
+        vector<int> pos(n+1, -1);
+        for (int i = 1; i <= n; i++){
+            pos[a[i]] = i;
+        }
+ 
+      
+        queue<int> qForce;
+        queue<int> qMissing;
+ 
+        
+        int forcedCount = 0;
+ 
+      
+        auto forceIndex = [&](int idx) {
+            if(!forced[idx]){
+                forced[idx] = true;
+                forcedCount++;
+                qForce.push(idx);
+                
+                if(a[idx] != 0){
+                    int val = a[idx];
+                   
+                    if(pos[val] == idx){
+                        pos[val] = -1;
+                        
+                        if(!forced[val]){
+                            qMissing.push(val);
+                        }
+                    }
+                }
+            }
+        };
+ 
+     
+        auto processQueues = [&]() {
+            while(!qForce.empty() || !qMissing.empty()){
+             
+                while(!qForce.empty()){
+                    int u = qForce.front();
+                    qForce.pop();
+            
+                    if(u >= 1 && u <= n){
+                        int idx = pos[u];
+                        if(idx != -1 && !forced[idx]){
+                            forceIndex(idx);
+                        }
+                    }
+                }
+            
+                while(!qMissing.empty()){
+                    int num = qMissing.front();
+                    qMissing.pop();
+                    
+                    if(!forced[num] && pos[num] == -1){
+                        forceIndex(num);
+                    }
+                }
+            }
+        };
+ 
+      
+        for (int qi = 1; qi <= n; qi++){
+            int idx = d[qi];
+           
+            if(!forced[idx]){
+                if(a[idx] != 0){
+                    int val = a[idx];
+                    a[idx] = 0; 
+                    if(pos[val] == idx){
+                        pos[val] = -1;
+                        if(!forced[val]){
+                            qMissing.push(val);
+                        }
+                    }
+                }
+                
+                forceIndex(idx);
+                
+                processQueues();
+            }
+           
+            cout << forcedCount << "\n";
+        }
+    }
